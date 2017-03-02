@@ -2,6 +2,10 @@
 #include "toolbox1.h"
 
 #include <QHBoxLayout>
+#include <QDateTime>
+#include <QScrollBar>
+#include <QMessageBox>
+#include <QColorDialog>
 
 Widget::Widget(const QIcon icon, int ID, QString name, toolbox1 *w, QWidget *parent)
     : QWidget(parent)
@@ -120,4 +124,117 @@ void Widget::init_widget()
         textBrowser->setCurrentFont(fontComboBox->font());//设置textBrowser的默认字体
         textBrowser->setFontPointSize(comboBox->currentText().toDouble());//设置textBrowser的默认字号
         lineEdit->setFocus();
+}
+
+void Widget::add_msg(QString delivername, QString msg)
+{
+    //得到当前时间，并把时间格式化为"yyy-MM-dd hh:ss:ss"形式的字符串
+    QString sTime = QDateTime::currentDateTime().toString("yyy-MM-dd hh:ss:ss");
+    textBrowser->append("[" + delivername + "]" + sTime);
+    textBrowser->append(msg);
+
+    //当消息textbrowser中消息过多出现滚动条，自动滚动到最下方
+    textBrowser->verticalScrollBar()->setValue(textBrowser->verticalScrollBar()->maximum());
+}
+
+void Widget::on_pushButton_clicked()
+{
+    if(lineEdit->text().isEmpty())//如果lineEdit控件内容为空，提示用户不能发送空消息
+    {
+        QMessageBox::information(this, tr("注意"), tr("不能发送空消息"));
+    }else
+    {
+        add_msg(tr("我的消息"), lineEdit->text());
+         main_w->send_Msg(userID, lineEdit->text().toStdString().data());//调用主窗口的send_Msg方法，向服务器提交send消息
+         lineEdit->clear();//发送完成后，将lineEdit控件内容清空
+    }
+    lineEdit->setFocus();
+}
+
+void Widget::on_fontComboxBox_currentFontChanged(const QFont &f)//修改textBrowser字体
+{
+    textBrowser->setCurrentFont(f);
+    textBrowser->setFontPointSize(comboBox->currentText().toDouble());
+    if(toolButton_1->isChecked())
+    {
+        textBrowser->setFontWeight(QFont::Bold);
+    }
+    else
+        {
+            textBrowser->setFontWeight(QFont::Normal);
+        }
+
+        if(toolButton_2->isChecked())
+        {
+            textBrowser->setFontItalic(true);
+        }
+        else
+        {
+            textBrowser->setFontItalic(false);
+        }
+
+        if(toolButton_3->isChecked())
+        {
+            textBrowser->setFontUnderline(true);
+        }
+        else
+        {
+            textBrowser->setFontUnderline(false);
+        }
+
+        textBrowser->setTextColor(color);
+        lineEdit->setFocus();
+}
+
+void Widget::on_comboBox_currentIndexChanged(const QString &arg1)//修改textBrowser字号
+{
+    textBrowser->setFontPointSize(arg1.toDouble());
+    lineEdit->setFocus();
+}
+
+void Widget::on_toolButton_1_clicked(bool checked)//修改textBroer字是否加粗
+{
+    if(checked)
+    {
+        textBrowser->setFontWeight(QFont::Bold);
+    }
+    else
+    {
+        textBrowser->setFontWeight(QFont::Normal);
+    }
+    lineEdit->setFocus();
+}
+
+void Widget::on_toolButton_2_clicked(bool checked)//修改textBroer字是否斜体
+{
+    textBrowser->setFontItalic(checked);
+    lineEdit->setFocus();
+}
+
+void Widget::on_toolButton_3_clicked(bool checked)//修改textBroer字是否下划线
+{
+    textBrowser->setFontUnderline(checked);
+    lineEdit->setFocus();
+}
+
+void Widget::on_toolButton_4_clicked()//修改textBroer字体颜色
+{
+    color = QColorDialog::getColor(color,this);
+    if(color.isValid())
+    {
+        textBrowser->setTextColor(color);
+        lineEdit->setFocus();
+    }
+}
+
+void Widget::on_toolButton_clicked()//
+{
+    main_w->hide();
+    main_w->showNormal();
+}
+
+void Widget::on_lineEdit_returnPressed()
+{
+    if (pushButton->isEnabled())//如果pushButton没有变灰，那么就可以调用on_pushButton_clicked()函数
+        on_pushButton_clicked();
 }

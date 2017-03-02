@@ -8,13 +8,23 @@
 
 #include "widget.h"
 
-#define CLINETCOUNT 256 //鏈�澶у鎴风鏁伴噺
+#define CLINETCOUNT 256 //最大客户端数量
+#define MSGBODYBUF 1024
+
+//定义消息结构
+struct msg_t
+{
+    unsigned char head[4];
+    char body[MSGBODYBUF];
+};
+
 
 class toolbox1 : public QToolBox
 {
     Q_OBJECT
 public:
     explicit toolbox1(QWidget *parent = 0);
+    void send_Msg(int d_userid, const char *msgBody);//发往server的send消息
 
 signals:
 
@@ -22,9 +32,9 @@ public slots:
     bool eventFilter(QObject *watched, QEvent *event);
 private:
     int userid;
-        QString passwd;
-        QString hostip;
-        int hostport;
+    QString passwd;
+    QString hostip;
+    int hostport;
 
     QString username[CLINETCOUNT];
     QToolButton *toolBtn[CLINETCOUNT];
@@ -35,6 +45,13 @@ private:
     void init_username();
 
     QTcpSocket *sockClient;
+    void login_Msg();
+
+    void recv_send_Msg(int o_userid, const char *msgBody);//来自server的消息
+    void userStatus_Msg(const char *msgBody);//来自server的deliver消息
+
+    void system_Msg(int msgcode);//来自server的消息
+
 
 private slots:
     void sock_Error(QAbstractSocket::SocketError sockErr);//socket出错的时候触发的槽函数

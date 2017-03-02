@@ -19,6 +19,7 @@ class Widget : public QWidget
 public:
     Widget(const QIcon icon, int ID, QString name, toolbox1 *w, QWidget *parent = 0);
     ~Widget();
+    void add_msg(QString delivername, QString msg);
     QPushButton *pushButton;
 
 private:
@@ -38,6 +39,18 @@ private:
     QString username;
     QColor color;
     toolbox1 *main_w;
+
+private slots:
+    void on_pushButton_clicked();
+    void on_fontComboxBox_currentFontChanged(const QFont &f);
+    void on_comboBox_currentIndexChanged(const QString &arg1);
+    void on_toolButton_1_clicked(bool checked);
+    void on_toolButton_2_clicked(bool checked);
+    void on_toolButton_3_clicked(bool checked);
+    void on_toolButton_4_clicked();
+    void on_toolButton_clicked();
+    void on_lineEdit_returnPressed();
+
 };
 
 #endif // WIDGET_H
